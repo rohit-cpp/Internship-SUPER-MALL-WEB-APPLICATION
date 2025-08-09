@@ -1,7 +1,34 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from "mongoose";
 
-const categorySchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
-}, { timestamps: true });
+export interface ICategory {
+  name: string;
+  description?: string;
+}
 
-export default mongoose.model('Category', categorySchema);
+export interface ICategoryDocument extends ICategory, Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const categorySchema = new Schema<ICategoryDocument>(
+  {
+    name: {
+      type: String,
+      required: [true, "Category name is required"],
+      unique: true,
+      trim: true,
+      maxlength: 50,
+    },
+    description: {
+      type: String,
+      default: "",
+      maxlength: 255,
+      trim: true,
+    },
+  },
+  { timestamps: true }
+);
+
+categorySchema.index({ name: 1 });
+
+export default mongoose.model<ICategoryDocument>("Category", categorySchema);
