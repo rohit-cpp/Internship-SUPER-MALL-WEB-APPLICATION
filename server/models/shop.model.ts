@@ -1,15 +1,14 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export interface IShop {
   name: string;
-  category: mongoose.Types.ObjectId;
-  floor: mongoose.Types.ObjectId;
-  owner: mongoose.Types.ObjectId;
+  owner: mongoose.Types.ObjectId; // Ref to User
+  category: mongoose.Types.ObjectId; // Ref to Category
+  floor: mongoose.Types.ObjectId; // Ref to Floor
   description?: string;
-  location?: {
-    lat: number;
-    lng: number;
-  };
+  address: string;
+  contact: string;
+  image?: string;
 }
 
 export interface IShopDocument extends IShop, Document {
@@ -17,50 +16,18 @@ export interface IShopDocument extends IShop, Document {
   updatedAt: Date;
 }
 
-const shopSchema = new Schema<IShopDocument>(
+const shopSchema = new mongoose.Schema<IShopDocument>(
   {
-    name: {
-      type: String,
-      required: [true, "Shop name is required"],
-      trim: true,
-      maxlength: 100,
-    },
-    category: {
-      type: Schema.Types.ObjectId,
-      ref: "Category",
-      required: [true, "Category reference is required"],
-    },
-    floor: {
-      type: Schema.Types.ObjectId,
-      ref: "Floor",
-      required: [true, "Floor reference is required"],
-    },
-    owner: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "Owner (User) is required"],
-    },
-    description: {
-      type: String,
-      default: "",
-      maxlength: 500,
-      trim: true,
-    },
-    location: {
-      lat: { type: Number, required: false },
-      lng: { type: Number, required: false },
-    },
+    name: { type: String, required: true },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
+    floor: { type: mongoose.Schema.Types.ObjectId, ref: "Floor", required: true },
+    description: { type: String, default: "" },
+    address: { type: String, required: true },
+    contact: { type: String, required: true },
+    image: { type: String, default: "" }
   },
   { timestamps: true }
 );
 
-// Populate references for queries
-shopSchema.pre(/^find/, function (next) {
-  const query = this as mongoose.Query<any, any>;
-  query.populate("category", "name")
-    .populate("floor", "number name")
-    .populate("owner", "fullname email");
-  next();
-});
-
-export default mongoose.model<IShopDocument>("Shop", shopSchema);
+export const Shop = mongoose.model<IShopDocument>("Shop", shopSchema);

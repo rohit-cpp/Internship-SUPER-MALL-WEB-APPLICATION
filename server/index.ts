@@ -1,22 +1,16 @@
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./db/connectDB";
+
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import authRoutes from "./routes/auth.route";
-import adminRoutes from "./routes/admin.route";
-import categoryRoutes from "./routes/category.route";
-import floorRoutes from "./routes/floor.route";
-import shopRoutes from "./routes/shop.route";
-import productRoutes from "./routes/product.route";
-import offerRoutes from "./routes/offer.route";
-import userRoutes from "./routes/user.route";
-import { notFound, errorHandler } from "./middlewares/error.middleware";
-import { logger } from "./middlewares/logging.middleware";
-import { apiLimiter } from "./middlewares/rateLimiter.middleware";
-
-
+import userRouter from "./routes/user.route";
+import categoryRouter from "./routes/category.route";
+import floorRouter from "./routes/floor.route";
+import offerRouter from "./routes/offer.route";
+import productRouter from "./routes/product.route";
+import shopRouter from "./routes/shop.route";
 dotenv.config();
 const app = express();
 
@@ -34,24 +28,16 @@ const corsOptions = {
     credentials:true
 }
 app.use(cors(corsOptions));
-app.use(logger);
-app.use("/api/v1/", apiLimiter);
 
 
 // apis
-// Mount routes
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/admin", adminRoutes);
-app.use("/api/v1/categories", categoryRoutes);
-app.use("/api/v1/floors", floorRoutes);
-app.use("/api/v1/shops", shopRoutes);
-app.use("/api/v1/products", productRoutes);
-app.use("/api/v1/offers", offerRoutes);
-app.use("/api/v1/user", userRoutes);
+app.use("/api/v2/user", userRouter);
+app.use("/api/v2/category", categoryRouter);
+app.use("/api/v2/floor",floorRouter );
+app.use("/api/v2/offer", offerRouter);
+app.use("/api/v2/product", productRouter);
+app.use("/api/v2/shop", shopRouter);
 
-// Error handling
-app.use(notFound);
-app.use(errorHandler);
 
 app.listen(PORT, () => {
     connectDB();

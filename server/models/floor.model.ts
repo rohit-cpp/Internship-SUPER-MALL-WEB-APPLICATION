@@ -1,8 +1,7 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export interface IFloor {
-  number: number;
-  name?: string;
+  floorNumber: number;
   description?: string;
 }
 
@@ -11,30 +10,12 @@ export interface IFloorDocument extends IFloor, Document {
   updatedAt: Date;
 }
 
-const floorSchema = new Schema<IFloorDocument>(
+const floorSchema = new mongoose.Schema<IFloorDocument>(
   {
-    number: {
-      type: Number,
-      required: [true, "Floor number is required"],
-      unique: true,
-      min: 0,
-    },
-    name: {
-      type: String,
-      default: "",
-      trim: true,
-      maxlength: 50,
-    },
-    description: {
-      type: String,
-      default: "",
-      trim: true,
-      maxlength: 255,
-    },
+    floorNumber: { type: Number, required: true, unique: true },
+    description: { type: String, default: "" },
   },
   { timestamps: true }
 );
 
-floorSchema.index({ number: 1 });
-
-export default mongoose.model<IFloorDocument>("Floor", floorSchema);
+export const Floor = mongoose.model<IFloorDocument>("Floor", floorSchema);

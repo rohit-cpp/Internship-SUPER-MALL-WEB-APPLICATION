@@ -1,16 +1,17 @@
 import express from "express";
-import { createFloor, listFloors } from "../controllers/floor.controller.js";
-import { protectAdmin } from "../middlewares/auth.middleware.js";
-
+import {
+  createFloor,
+  getAllFloors,
+  updateFloor,
+  deleteFloor,
+} from "../controllers/floor.controller";
+import { isAuthenticated } from "../middlewares/isAuthenticated";
 
 const router = express.Router();
 
-// Create a floor (admin only)
-// POST /api/v1/floors
-router.post("/", protectAdmin, createFloor);
-
-// Get all floors
-// GET /api/v1/floors
-router.get("/", listFloors);
+router.post("/", isAuthenticated, createFloor);
+router.get("/", getAllFloors);
+router.put("/:id", isAuthenticated, updateFloor);
+router.delete("/:id", isAuthenticated, deleteFloor);
 
 export default router;

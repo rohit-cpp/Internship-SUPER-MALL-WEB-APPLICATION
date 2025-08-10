@@ -1,24 +1,24 @@
 import express from "express";
 import {
   createProduct,
-  listProducts,
-  compareProducts
-} from "../controllers/product.controller.js";
-import { protectAdmin } from "../middlewares/auth.middleware.js";
-
+  getAllProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+  compareProducts,
+  filterProducts,
+} from "../controllers/product.controller";
+import { isAuthenticated } from "../middlewares/isAuthenticated";
 
 const router = express.Router();
 
-// Create product (admin only)
-// POST /api/v1/products
-router.post("/", protectAdmin, createProduct);
+router.post("/", isAuthenticated, createProduct);
+router.get("/", getAllProducts);
+router.get("/filter", filterProducts); // e.g., /api/v2/product/filter?shop=xxx&category=yyy
+router.get("/:id", getProductById);
+router.put("/:id", isAuthenticated, updateProduct);
+router.delete("/:id", isAuthenticated, deleteProduct);
 
-// List products (filters: ?shop=&offer=)
-// GET /api/v1/products
-router.get("/", listProducts);
-
-// Compare multiple products by comma-separated IDs
-// GET /api/v1/products/compare?ids=id1,id2,...
-router.get("/compare", compareProducts);
+router.post("/compare", compareProducts); // Pass array of IDs in body
 
 export default router;

@@ -1,16 +1,19 @@
 import express from "express";
-import { createOffer, listOffers } from "../controllers/offer.controller.js";
-import { protectAdmin } from "../middlewares/auth.middleware.js";
-
+import {
+  createOffer,
+  getAllOffers,
+  getOffersByShop,
+  updateOffer,
+  deleteOffer,
+} from "../controllers/offer.controller";
+import { isAuthenticated } from "../middlewares/isAuthenticated";
 
 const router = express.Router();
 
-// Create offer (admin only)
-// POST /api/v1/offers
-router.post("/", protectAdmin, createOffer);
-
-// List active offers
-// GET /api/v1/offers
-router.get("/", listOffers);
+router.post("/", isAuthenticated, createOffer);
+router.get("/", getAllOffers);
+router.get("/shop/:shopId", getOffersByShop);
+router.put("/:id", isAuthenticated, updateOffer);
+router.delete("/:id", isAuthenticated, deleteOffer);
 
 export default router;

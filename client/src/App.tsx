@@ -3,27 +3,19 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-
+import "./App.css";
 import Login from "./auth/Login";
 import Signup from "./auth/Signup";
 import ForgotPassword from "./auth/ForgotPassword";
 import ResetPassword from "./auth/ResetPassword";
 import VerifyEmail from "./auth/VerifyEmail";
-import HeroSection from "./user/HeroSection";
+import HeroSection from "./components/HeroSection";
 import MainLayout from "./Layout/MainLayout";
 import Profile from "./user/Profile";
-// import Dashboard from "./user/Dashboard";
-// import SearchPOI from "./user/SearchPOI";
-// import Decrypt from "./user/Decrypt";
-// import History from "./user/History";
+
 import { useUserStore } from "./store/useUserStore";
 import { useEffect } from "react";
 import Loading from "./components/ui/Loading";
-// import AdminDashboard from "./admin/AdminDashboard";
-// import AdminData from "./admin/AdminData";
-// import AdminLogs from "./admin/AdminLogs";
-// import ManagePOI from "./admin/ManagePOI";
-// import UploadData from "./admin/UploadData";
 
 const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, user } = useUserStore();
@@ -71,22 +63,7 @@ const appRouter = createBrowserRouter([
         path: "/profile",
         element: <Profile />,
       },
-      // {
-      //   path: "/dashboard",
-      //   element: <Dashboard />,
-      // },
-      // {
-      //   path: "/searchpoi",
-      //   element: <SearchPOI />,
-      // },
-      // {
-      //   path: "/decrypt",
-      //   element: <Decrypt poiId={""} />,
-      // },
-      // {
-      //   path: "/history",
-      //   element: <History />,
-      // },
+
       //admin services starts here
       // {
       //   path: "/admin/dashboard",

@@ -1,23 +1,18 @@
 import express from "express";
-import {
-  listUsers,
-  getCurrentUser,
-  updateProfile
-} from "../controllers/user.controller.js";
-import { isAuthenticated } from "../middlewares/isAuthenticated.js";
+import { checkAuth, forgotPassword, getAllUsers, login, logout, resetPassword, signup, updateProfile, verifyEmail } from "../controllers/user.controller";
+import { isAuthenticated } from "../middlewares/isAuthenticated";
 
-const router = express.Router();
+const userRouter = express.Router();
 
-// Check authentication & get current user
-// GET /api/v1/user/me
-router.get("/me", isAuthenticated, getCurrentUser);
 
-// Update own profile
-// PUT /api/v1/user/profile
-router.put("/profile", isAuthenticated, updateProfile);
+userRouter.route("/check-auth").get(isAuthenticated, checkAuth);
+userRouter.route("/signup").post(signup);
+userRouter.route("/login").post(login);
+userRouter.route("/logout").post(logout);
+userRouter.route("/verify-email").post(verifyEmail);
+userRouter.route("/forgot-password").post(forgotPassword);
+userRouter.route("/reset-password/:token").post(resetPassword);
+userRouter.route("/profile/update").put(isAuthenticated, updateProfile);
+userRouter.route("/all").get(isAuthenticated, getAllUsers);
 
-// List all users (admin only via JWT role check in middleware)
-// GET /api/v1/user
-router.get("/", isAuthenticated, listUsers);
-
-export default router;
+export default userRouter;

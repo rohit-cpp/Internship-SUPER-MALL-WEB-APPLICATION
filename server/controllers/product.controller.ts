@@ -1,45 +1,84 @@
 import { Request, Response } from "express";
-import Product from "../models/product.model";
+import { Product } from "../models/product.model";
 
-// CREATE PRODUCT
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const { shop, name, price, features, description, images, stock, offer } = req.body;
-    const product = await Product.create({
-      shop, name, price, features, description, images, stock, offer
-    });
-    return res.status(201).json({ success: true, product });
-  } catch (err) {
-    console.error("createProduct:", err);
-    return res.status(500).json({ message: "Internal server error" });
+    const { name, description, price, features, shop, category, image } = req.body;
+    const product = await Product.create({ name, description, price, features, shop, category, image });
+    res.status(201).json({ success: true, product });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-// LIST PRODUCTS (FILTERABLE)
-export const listProducts = async (req: Request, res: Response) => {
+export const getAllProducts = async (_: Request, res: Response) => {
   try {
-    const filter: any = {};
-    if (req.query.shop)  filter.shop = req.query.shop;
-    if (req.query.offer) filter.offer = req.query.offer;
-    const products = await Product.find(filter);
-    return res.status(200).json({ success: true, products });
-  } catch (err) {
-    console.error("listProducts:", err);
-    return res.status(500).json({ message: "Internal server error" });
+    const products = await Product.find()
+      .populate("shop")
+      .populate("category")
+      .sort({ createdAt: -1 });
+    res.status(200).json({ success: true, products });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-// COMPARE PRODUCTS
+export const getProductById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const product = await Product.findById(id)
+      .populate("shop")
+      .populate("category");
+    if (!product) return res.status(404).json({ success: false, message: "Product not found" });
+    res.status(200).json({ success: true, product });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// Compare products by price & features
 export const compareProducts = async (req: Request, res: Response) => {
   try {
-    if (!req.query.ids) {
-      return res.status(400).json({ message: "Product IDs required" });
-    }
-    const ids = (req.query.ids as string).split(",");
-    const products = await Product.find({ _id: { $in: ids } });
-    return res.status(200).json({ success: true, products });
-  } catch (err) {
-    console.error("compareProducts:", err);
-    return res.status(500).json({ message: "Internal server error" });
+    const { ids } = req.body; // array of product IDs
+    const products = await Product.find({ _id: { $in: ids } }).populate("shop").populate("category");
+    res.status(200).json({ success: true, products });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// Filter products by shop or category
+export const filterProducts = async (req: Request, res: Response) => {
+  try {
+    const { shop, category } = req.query;
+    let filter: any = {};
+    if (shop) filter.shop = shop;
+    if (category) filter.category = category;
+    const products = await Product.find(filter).populate("shop").populate("category");
+    res.status(200).json({ success: true, products });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const updateProduct = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    const product = await Product.findByIdAndUpdate(id, updates, { new: true });
+    if (!product) return res.status(404).json({ success: false, message: "Product not found" });
+    res.status(200).json({ success: true, product });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const deleteProduct = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    await Product.findByIdAndDelete(id);
+    res.status(200).json({ success: true, message: "Product deleted" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

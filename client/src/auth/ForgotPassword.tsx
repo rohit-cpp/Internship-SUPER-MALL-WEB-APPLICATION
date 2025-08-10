@@ -1,37 +1,73 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail, Shield, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const ForgotPassword = () => {
-    const [email, setEmail] = useState<string>("");
-    const loading= false;
-   return (
-       <div className="flex items-center justify-center min-h-screen-full">
-           <form className="flex flex-col gap-5 md:border md:p-8w-full max-w-md rounded-lg mx-4">
-               <div className="text-center">
-                   <h1 className="font-extrabold text-2xl mb-2">Forgot Password</h1>
-                   <p className="text-sm text-gray-600">Enter your Email Address to rest your password</p>
-               </div>
-               <div>
-                   <Input
-                       type="text"
-                       value={email}
-                       onChange={(e) => setEmail(e.target.value)}
-                   placeholder="Enter your Email"/>
-               </div>
-               {
-                   loading?<Button disabled><Loader2 className="mr-2 h-4 w-4 animate-spin"/>Please wait</Button>:<Button > Send Reset Link</Button>
-               }
-               <div>
-                   <span>Back to 
-                       <Link to="/login" className="text-blue-500 ml-1">Login</Link>
-                   </span>
-               </div>
-           </form>
-     </div>
-   )
- }
- 
+  const [email, setEmail] = useState<string>("");
+  const loading = false;
+
+  return (
+    <div className="relative min-h-screen overflow-hidden bg-neutral-900 flex items-center justify-center">
+      {/* Background Effects */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-1/3 left-1/3 h-96 w-96 rounded-full bg-fuchsia-600/20 blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/3 right-1/3 h-72 w-72 rounded-full bg-cyan-500/20 blur-3xl animate-pulse delay-2000" />
+      </div>
+
+      <div className="w-full max-w-md mx-4">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center p-3 rounded-full bg-gradient-to-r from-cyan-400 to-fuchsia-500 mb-4 neon-border shadow-fuchsia-500/40">
+            <Shield className="h-8 w-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-extrabold text-white mb-2">
+            Reset Password
+          </h1>
+          <p className="text-neutral-400">
+            Enter your email address to receive a reset link
+          </p>
+        </div>
+
+        {/* Form */}
+        <form className="space-y-6 bg-neutral-800/60 backdrop-blur-sm border border-neutral-700 rounded-2xl p-8 neon-border shadow-fuchsia-500/10">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-neutral-300 flex items-center gap-2">
+              <Mail className="h-4 w-4" />
+              Email Address
+            </label>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email address"
+              className="bg-neutral-700/50 border-neutral-600 text-white placeholder:text-neutral-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+            />
+          </div>
+
+          {loading ? (
+            <Button disabled className="w-full bg-neutral-700 text-neutral-400">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Sending reset link...
+            </Button>
+          ) : (
+            <Button className="w-full bg-gradient-to-r from-cyan-400 to-fuchsia-500 text-white font-semibold hover:shadow-lg hover:shadow-fuchsia-500/25 neon-border shadow-fuchsia-500/30 transition-all">
+              Send Reset Link
+            </Button>
+          )}
+
+          <Link
+            to="/login"
+            className="flex items-center justify-center gap-2 text-neutral-400 hover:text-fuchsia-400 transition-colors font-medium"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Login
+          </Link>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 export default ForgotPassword;

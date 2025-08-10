@@ -1,16 +1,18 @@
 import express from "express";
-import { createCategory, listCategories } from "../controllers/category.controller.js";
-import { protectAdmin } from "../middlewares/auth.middleware.js";
-
+import {
+  createCategory,
+  getAllCategories,
+  updateCategory,
+  deleteCategory,
+} from "../controllers/category.controller";
+import { isAuthenticated } from "../middlewares/isAuthenticated";
 
 const router = express.Router();
 
-// Create a category (admin only)
-// POST /api/v1/categories
-router.post("/", protectAdmin, createCategory);
-
-// Get all categories
-// GET /api/v1/categories
-router.get("/", listCategories);
+// CRUD for Admin only; listing for all.
+router.post("/", isAuthenticated, createCategory);
+router.get("/", getAllCategories);
+router.put("/:id", isAuthenticated, updateCategory);
+router.delete("/:id", isAuthenticated, deleteCategory);
 
 export default router;

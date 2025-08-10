@@ -1,29 +1,19 @@
 import express from "express";
 import {
   createShop,
+  getAllShops,
+  getShopById,
   updateShop,
-  listShops,
-  getShopDetails
-} from "../controllers/shop.controller.js";
-import { protectAdmin } from "../middlewares/auth.middleware.js";
-
+  deleteShop,
+} from "../controllers/shop.controller";
+import { isAuthenticated } from "../middlewares/isAuthenticated";
 
 const router = express.Router();
 
-// Create shop (admin only)
-// POST /api/v1/shops
-router.post("/", protectAdmin, createShop);
-
-// Update shop by ID (admin only)
-// PUT /api/v1/shops/:id
-router.put("/:id", protectAdmin, updateShop);
-
-// List shops (optional filters: ?category=&floor=)
-// GET /api/v1/shops
-router.get("/", listShops);
-
-// Get shop details
-// GET /api/v1/shops/:id
-router.get("/:id", getShopDetails);
+router.post("/", isAuthenticated, createShop);    // Create shop
+router.get("/", getAllShops);                     // List all shops
+router.get("/:id", getShopById);                  // Get shop by id
+router.put("/:id", isAuthenticated, updateShop);  // Update shop
+router.delete("/:id", isAuthenticated, deleteShop); // Delete shop
 
 export default router;

@@ -1,57 +1,29 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export interface IOffer {
   title: string;
   description?: string;
-  discount: number;
-  validFrom: Date;
-  validTo: Date;
+  discountPercentage: number;
+  startDate: Date;
+  endDate: Date;
+  shop: mongoose.Types.ObjectId; // Ref to Shop
 }
 
 export interface IOfferDocument extends IOffer, Document {
   createdAt: Date;
   updatedAt: Date;
-  isActive(): boolean;
 }
 
-const offerSchema = new Schema<IOfferDocument>(
+const offerSchema = new mongoose.Schema<IOfferDocument>(
   {
-    title: {
-      type: String,
-      required: [true, "Offer title is required"],
-      trim: true,
-      maxlength: 100,
-    },
-    description: {
-      type: String,
-      default: "",
-      maxlength: 500,
-      trim: true,
-    },
-    discount: {
-      type: Number,
-      required: [true, "Discount percentage is required"],
-      min: 0,
-      max: 100,
-    },
-    validFrom: {
-      type: Date,
-      required: [true, "Start date is required"],
-    },
-    validTo: {
-      type: Date,
-      required: [true, "End date is required"],
-    },
+    title: { type: String, required: true },
+    description: { type: String, default: "" },
+    discountPercentage: { type: Number, required: true },
+    startDate: { type: Date, required: true },
+    endDate: { type: Date, required: true },
+    shop: { type: mongoose.Schema.Types.ObjectId, ref: "Shop", required: true },
   },
   { timestamps: true }
 );
 
-// Instance method to check if offer is currently active
-offerSchema.methods.isActive = function () {
-  const now = new Date();
-  return now >= this.validFrom && now <= this.validTo;
-};
-
-offerSchema.index({ validTo: 1 });
-
-export default mongoose.model<IOfferDocument>("Offer", offerSchema);
+export const Offer = mongoose.model<IOfferDocument>("Offer", offerSchema);

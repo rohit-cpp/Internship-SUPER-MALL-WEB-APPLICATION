@@ -1,28 +1,47 @@
 import { Request, Response } from "express";
-import Floor from "../models/floor.model";
+import { Floor } from "../models/floor.model";
 
-// CREATE FLOOR
 export const createFloor = async (req: Request, res: Response) => {
   try {
-    const { number, name, description } = req.body;
-    if (number === undefined) return res.status(400).json({ message: "Number is required" });
-    const exists = await Floor.findOne({ number });
-    if (exists) return res.status(409).json({ message: "Floor number exists" });
-    const floor = await Floor.create({ number, name, description });
-    return res.status(201).json({ success: true, floor });
-  } catch (err) {
-    console.error("createFloor:", err);
-    return res.status(500).json({ message: "Internal server error" });
+    const { floorNumber, description } = req.body;
+    const existing = await Floor.findOne({ floorNumber });
+    if (existing) {
+      return res.status(400).json({ success: false, message: "Floor already exists" });
+    }
+    const floor = await Floor.create({ floorNumber, description });
+    res.status(201).json({ success: true, floor });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-// LIST FLOORS
-export const listFloors = async (_: Request, res: Response) => {
+export const getAllFloors = async (_: Request, res: Response) => {
   try {
-    const floors = await Floor.find().sort("number");
-    return res.status(200).json({ success: true, floors });
-  } catch (err) {
-    console.error("listFloors:", err);
-    return res.status(500).json({ message: "Internal server error" });
+    const floors = await Floor.find().sort({ floorNumber: 1 });
+    res.status(200).json({ success: true, floors });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const updateFloor = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { floorNumber, description } = req.body;
+    const floor = await Floor.findByIdAndUpdate(id, { floorNumber, description }, { new: true });
+    if (!floor) return res.status(404).json({ success: false, message: "Floor not found" });
+    res.status(200).json({ success: true, floor });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const deleteFloor = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    await Floor.findByIdAndDelete(id);
+    res.status(200).json({ success: true, message: "Floor deleted" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
