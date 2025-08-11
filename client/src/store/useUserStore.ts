@@ -4,10 +4,11 @@ import axios from "axios";
 import type { LoginInputState, SignupInputState } from "@/schema/userSchema";
 import { toast } from "sonner";
 
-const API_END_POINT = "http://localhost:8001/api/v1/user";
+const API_END_POINT = "http://localhost:8002/api/v2/user";
 axios.defaults.withCredentials = true;
 
 type User = {
+    _id: Key | null | undefined;
     fullname: string;
     email: string;
     contact: number;
