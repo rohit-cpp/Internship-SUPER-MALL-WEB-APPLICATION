@@ -76,9 +76,9 @@ const appRouter = createBrowserRouter([
   {
     path: "/",
     element: (
-      // <ProtectedRoutes>
-      <MainLayout />
-      // </ProtectedRoutes>
+      <ProtectedRoutes>
+        <MainLayout />
+      </ProtectedRoutes>
     ),
     children: [
       {
@@ -111,9 +111,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/admin",
         element: (
-          // <AdminRoute>
-          <AdminLayout />
-          // {/* </AdminRoute> */}
+          <AdminRoute>
+            <AdminLayout />
+            //{" "}
+          </AdminRoute>
         ),
         children: [
           { path: "create-shop", element: <ManageShops /> },
