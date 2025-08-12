@@ -1,3 +1,4 @@
+// src/components/Navbar.tsx
 import { Link, useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
@@ -6,13 +7,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarTrigger,
-} from "@/components/ui/menubar";
 import {
   Sheet,
   SheetClose,
@@ -31,21 +25,22 @@ import {
   Menu,
   Moon,
   Sun,
-  User,
   Settings,
   LogOut,
   Shield,
-  Search,
-  History,
-  BarChart3,
-  Database,
-  Upload,
-  MapPin,
-  Lock,
   Home,
+  LucideShoppingBag,
+  LucideTags,
+  LucideLayers,
+  LucidePlusSquare,
+  LucideList,
+  LucideStore,
+  LucideBuilding2,
+  LucidePackageSearch,
+  LucideGitCompare,
 } from "lucide-react";
 
-/* ─────────────────────────────  DESKTOP NAVBAR  ───────────────────────────── */
+/* ===================== MAIN NAVBAR ===================== */
 export const Navbar = () => {
   const { user, loading, logout } = useUserStore();
   const navigate = useNavigate();
@@ -64,25 +59,36 @@ export const Navbar = () => {
       .slice(0, 2) || "U";
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-neutral-800 bg-neutral-900/80 backdrop-blur supports-[backdrop-filter]:bg-neutral-900/60">
+    <nav className="sticky top-0 z-50 border-b border-slate-800/50 bg-slate-950/90 backdrop-blur-xl supports-[backdrop-filter]:bg-slate-950/80">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* ─── Logo ─────────────────────────────────────────────────── */}
-        <Link to="/" className="flex items-center gap-2">
-          <span className="rounded-lg bg-gradient-to-r from-cyan-400 to-fuchsia-500 p-2 neon-border shadow-fuchsia-500/40">
-            <Shield className="h-5 w-5 text-white" />
-          </span>
-          <span className="bg-gradient-to-r from-cyan-400 to-fuchsia-500 bg-clip-text text-xl font-extrabold text-transparent tracking-tight neon-text">
-            EPLQ
-          </span>
+        {/* Logo */}
+        <Link
+          to="/"
+          className="group flex items-center gap-3 transition-all duration-300 hover:scale-105"
+        >
+          <div className="relative">
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-400 to-violet-500 opacity-75 blur-sm group-hover:opacity-100 group-hover:blur-md transition-all duration-300"></div>
+            <div className="relative rounded-xl bg-gradient-to-r from-cyan-400 to-violet-500 p-2.5 shadow-lg shadow-cyan-500/25">
+              <LucideShoppingBag className="h-5 w-5 text-white" />
+            </div>
+          </div>
+          <div className="relative">
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-500 bg-clip-text text-xl font-bold text-transparent drop-shadow-sm">
+              Super Mall
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-500 bg-clip-text text-xl font-bold text-transparent opacity-0 blur-sm group-hover:opacity-50 transition-opacity duration-300">
+              Super Mall
+            </div>
+          </div>
         </Link>
 
-        {/* ─── Main Navigation (Desktop) ────────────────────────────── */}
-        <div className="hidden md:flex items-center gap-8">
-          {user?.admin ? <AdminLinks /> : <UserLinks />}
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-1">
+          <DesktopLinks user={user} />
         </div>
 
-        {/* ─── Right-Side Actions ──────────────────────────────────── */}
-        <div className="flex items-center gap-3">
+        {/* Actions */}
+        <div className="flex items-center gap-2">
           <ThemeToggle />
           <ProfileDropdown
             user={user}
@@ -90,9 +96,14 @@ export const Navbar = () => {
             handleLogout={handleLogout}
             getInitials={getInitials}
           />
-          {/* Mobile menu trigger */}
+          {/* Mobile Menu */}
           <div className="md:hidden">
-            <MobileNavbar />
+            <MobileNavbar
+              user={user}
+              loading={loading}
+              handleLogout={handleLogout}
+              getInitials={getInitials}
+            />
           </div>
         </div>
       </div>
@@ -100,175 +111,142 @@ export const Navbar = () => {
   );
 };
 
-/* ─────────────────────────────  HELPER COMPONENTS  ────────────────────────── */
-const NavLink = ({
-  to,
-  icon: Icon,
-  label,
-}: {
-  to: string;
-  icon: any;
-  label: string;
-}) => (
-  <Link
-    to={to}
-    className="flex items-center gap-2 text-neutral-300 transition hover:text-cyan-400"
-  >
-    <Icon className="h-4 w-4" />
-    {label}
-  </Link>
-);
+/* ===================== DESKTOP NAV LINKS ===================== */
+const DesktopLinks = ({ user }: { user: any }) => {
+  const linkClasses =
+    "group relative flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:text-white transition-all duration-300 hover:bg-slate-800/50 hover:shadow-lg hover:shadow-cyan-500/10";
 
-const AdminLinks = () => (
-  <>
-    <NavLink to="/" icon={Home} label="Home" />
-    <NavLink to="/admin/upload-data" icon={Upload} label="Upload" />
-    <NavLink to="/admin/managepoi" icon={MapPin} label="Manage POI" />
-    {/* Dropdown for admin panel */}
-    <Menubar>
-      <MenubarMenu>
-        <MenubarTrigger className="flex items-center gap-1 cursor-pointer text-neutral-300 hover:text-cyan-400">
-          <BarChart3 className="h-4 w-4" />
-          Admin&nbsp;Panel
-        </MenubarTrigger>
-        <MenubarContent>
-          <Link to="/admin/dashboard">
-            <MenubarItem>
-              <BarChart3 className="mr-2 h-4 w-4" />
-              Dashboard
-            </MenubarItem>
-          </Link>
-          <Link to="/admin/data">
-            <MenubarItem>
-              <Database className="mr-2 h-4 w-4" />
-              User&nbsp;Data
-            </MenubarItem>
-          </Link>
-          <Link to="/admin/logs">
-            <MenubarItem>
-              <History className="mr-2 h-4 w-4" />
-              Query&nbsp;Logs
-            </MenubarItem>
-          </Link>
-        </MenubarContent>
-      </MenubarMenu>
-    </Menubar>
-  </>
-);
+  const AdminMenu = (
+    <>
+      <Link className={linkClasses} to="/">
+        <Home className="h-4 w-4 group-hover:text-cyan-400 transition-colors" />
+        <span className="font-medium">Home</span>
+      </Link>
+      <Link className={linkClasses} to="/admin/create-shop">
+        <LucidePlusSquare className="h-4 w-4 group-hover:text-cyan-400 transition-colors" />
+        <span className="font-medium">Create Shop</span>
+      </Link>
+      <Link className={linkClasses} to="/admin/manage-shops">
+        <LucideStore className="h-4 w-4 group-hover:text-cyan-400 transition-colors" />
+        <span className="font-medium">Manage Shops</span>
+      </Link>
+      <Link className={linkClasses} to="/admin/manage-products">
+        <LucideShoppingBag className="h-4 w-4 group-hover:text-cyan-400 transition-colors" />
+        <span className="font-medium">Products</span>
+      </Link>
+      <Link className={linkClasses} to="/admin/manage-offers">
+        <LucideTags className="h-4 w-4 group-hover:text-cyan-400 transition-colors" />
+        <span className="font-medium">Offers</span>
+      </Link>
+      <Link className={linkClasses} to="/admin/manage-categories">
+        <LucideLayers className="h-4 w-4 group-hover:text-cyan-400 transition-colors" />
+        <span className="font-medium">Categories</span>
+      </Link>
+      <Link className={linkClasses} to="/admin/manage-floors">
+        <LucideBuilding2 className="h-4 w-4 group-hover:text-cyan-400 transition-colors" />
+        <span className="font-medium">Floors</span>
+      </Link>
+    </>
+  );
 
-const UserLinks = () => (
-  <>
-    <NavLink to="/" icon={Home} label="Home" />
-    <NavLink to="/searchpoi" icon={Search} label="Search POI" />
-    <NavLink to="/decrypt" icon={Lock} label="Decrypt" />
-    {/* User dropdown */}
-    <Menubar>
-      <MenubarMenu>
-        <MenubarTrigger className="flex items-center gap-1 cursor-pointer text-neutral-300 hover:text-cyan-400">
-          <User className="h-4 w-4" />
-          User&nbsp;Menu
-        </MenubarTrigger>
-        <MenubarContent>
-          <Link to="/dashboard">
-            <MenubarItem>
-              <BarChart3 className="mr-2 h-4 w-4" />
-              Dashboard
-            </MenubarItem>
-          </Link>
-          <Link to="/history">
-            <MenubarItem>
-              <History className="mr-2 h-4 w-4" />
-              History
-            </MenubarItem>
-          </Link>
-        </MenubarContent>
-      </MenubarMenu>
-    </Menubar>
-  </>
-);
+  const UserMenu = (
+    <>
+      <Link className={linkClasses} to="/">
+        <Home className="h-4 w-4 group-hover:text-cyan-400 transition-colors" />
+        <span className="font-medium">Home</span>
+      </Link>
+      <Link className={linkClasses} to="/shop-list">
+        <LucideList className="h-4 w-4 group-hover:text-cyan-400 transition-colors" />
+        <span className="font-medium">Shop List</span>
+      </Link>
+      <Link className={linkClasses} to="/products">
+        <LucidePackageSearch className="h-4 w-4 group-hover:text-cyan-400 transition-colors" />
+        <span className="font-medium">All Products</span>
+      </Link>
+      <Link className={linkClasses} to="/compare">
+        <LucideGitCompare className="h-4 w-4 group-hover:text-cyan-400 transition-colors" />
+        <span className="font-medium">Compare</span>
+      </Link>
+    </>
+  );
 
-const ThemeToggle = () => (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button
-        size="icon"
-        variant="ghost"
-        className="rounded-full text-neutral-300 hover:text-cyan-400"
-      >
-        <Sun className="h-4 w-4 rotate-0 scale-100 dark:-rotate-90 dark:scale-0" />
-        <Moon className="absolute h-4 w-4 rotate-90 scale-0 dark:rotate-0 dark:scale-100" />
-        <span className="sr-only">Toggle theme</span>
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align="end">
-      <DropdownMenuItem>Light</DropdownMenuItem>
-      <DropdownMenuItem>Dark</DropdownMenuItem>
-      <DropdownMenuItem>System</DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
-);
+  return user?.admin ? AdminMenu : UserMenu;
+};
 
+/* ===================== PROFILE DROPDOWN ===================== */
 const ProfileDropdown = ({ user, loading, handleLogout, getInitials }: any) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
-        <Avatar className="h-10 w-10 border-2 border-neutral-800">
+      <Button
+        variant="ghost"
+        className="relative h-10 w-10 rounded-full p-0 hover:bg-slate-800/50 transition-all duration-300"
+      >
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 opacity-0 hover:opacity-20 transition-opacity duration-300"></div>
+        <Avatar className="h-10 w-10 border-2 border-slate-700 hover:border-cyan-400/50 transition-colors duration-300">
           <AvatarImage src={user?.profilePicture} alt={user?.fullname} />
-          <AvatarFallback className="bg-gradient-to-r from-cyan-400 to-fuchsia-500 text-white">
+          <AvatarFallback className="bg-gradient-to-r from-cyan-400 to-violet-500 text-white font-semibold">
             {getInitials(user?.fullname)}
           </AvatarFallback>
         </Avatar>
-        {user?.isVerified && (
-          <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-neutral-900 bg-emerald-400" />
-        )}
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align="end" className="w-56">
-      <div className="flex items-center gap-2 p-2">
-        <div className="flex flex-col">
-          <span className="font-medium">{user?.fullname}</span>
-          <span className="truncate text-xs text-neutral-500">
-            {user?.email}
-          </span>
-          <div className="mt-1 flex gap-1">
+    <DropdownMenuContent
+      align="end"
+      className="w-64 bg-slate-900/95 backdrop-blur-xl border-slate-700/50"
+    >
+      <div className="flex items-center gap-3 p-3">
+        <Avatar className="h-12 w-12 border-2 border-slate-700">
+          <AvatarImage src={user?.profilePicture} alt={user?.fullname} />
+          <AvatarFallback className="bg-gradient-to-r from-cyan-400 to-violet-500 text-white font-semibold">
+            {getInitials(user?.fullname)}
+          </AvatarFallback>
+        </Avatar>
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold text-white truncate">{user?.fullname}</p>
+          <p className="text-sm text-slate-400 truncate">{user?.email}</p>
+          <div className="mt-2 flex gap-1">
             {user?.admin && (
-              <Badge variant="secondary" className="text-xs">
-                <Shield className="mr-1 h-3 w-3" />
-                Admin
+              <Badge className="text-xs bg-gradient-to-r from-violet-500 to-purple-600 text-white border-0 shadow-lg shadow-violet-500/25">
+                <Shield className="mr-1 h-3 w-3" /> Admin
               </Badge>
             )}
             {user?.isVerified ? (
-              <Badge
-                variant="default"
-                className="text-xs bg-emerald-100 text-emerald-800"
-              >
+              <Badge className="text-xs bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-0 shadow-lg shadow-emerald-500/25">
                 Verified
               </Badge>
             ) : (
-              <Badge variant="outline" className="text-xs">
+              <Badge
+                variant="outline"
+                className="text-xs border-slate-600 text-slate-400"
+              >
                 Unverified
               </Badge>
             )}
           </div>
         </div>
       </div>
-      <DropdownMenuSeparator />
-      <Link to="/profile">
-        <DropdownMenuItem>
-          <Settings className="mr-2 h-4 w-4" />
-          Profile Settings
-        </DropdownMenuItem>
-      </Link>
-      <DropdownMenuSeparator />
+      <DropdownMenuSeparator className="bg-slate-700/50" />
+      <DropdownMenuItem
+        asChild
+        className="hover:bg-slate-800/50 focus:bg-slate-800/50"
+      >
+        <Link
+          to="/profile"
+          className="flex items-center text-slate-300 hover:text-white"
+        >
+          <Settings className="mr-3 h-4 w-4" /> Profile Settings
+        </Link>
+      </DropdownMenuItem>
+      <DropdownMenuSeparator className="bg-slate-700/50" />
       <DropdownMenuItem
         disabled={loading}
         onClick={handleLogout}
-        className="text-red-600 focus:text-red-600"
+        className="text-red-400 hover:text-red-300 hover:bg-red-500/10 focus:bg-red-500/10"
       >
         {loading ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <Loader2 className="mr-3 h-4 w-4 animate-spin" />
         ) : (
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className="mr-3 h-4 w-4" />
         )}
         {loading ? "Logging out…" : "Log out"}
       </DropdownMenuItem>
@@ -276,152 +254,197 @@ const ProfileDropdown = ({ user, loading, handleLogout, getInitials }: any) => (
   </DropdownMenu>
 );
 
-/* ─────────────────────────────  MOBILE NAVBAR  ───────────────────────────── */
-export const MobileNavbar = () => {
-  const { user, logout, loading } = useUserStore();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
-  };
-
-  const getInitials = (name?: string) =>
-    name
-      ?.split(" ")
-      .map((w) => w[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2) || "U";
-
-  return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="rounded-full text-neutral-300 hover:text-cyan-400"
-        >
-          <Menu className="h-5 w-5" />
-          <span className="sr-only">Open menu</span>
-        </Button>
-      </SheetTrigger>
-
-      <SheetContent
-        side="right"
-        className="w-80 bg-neutral-900/90 backdrop-blur"
+/* ===================== THEME TOGGLE ===================== */
+const ThemeToggle = () => (
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="relative rounded-full text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 transition-all duration-300"
       >
-        <SheetHeader>
-          <div className="flex items-center justify-between">
-            <SheetTitle className="flex items-center gap-2">
-              <span className="rounded-lg bg-gradient-to-r from-cyan-400 to-fuchsia-500 p-1.5 neon-border">
-                <Shield className="h-4 w-4 text-white" />
-              </span>
-              <span className="bg-gradient-to-r from-cyan-400 to-fuchsia-500 bg-clip-text text-lg font-bold text-transparent neon-text">
-                EPLQ
-              </span>
-            </SheetTitle>
-            <ThemeToggle />
-          </div>
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 opacity-0 hover:opacity-10 transition-opacity duration-300"></div>
+        <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+        <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent
+      align="end"
+      className="bg-slate-900/95 backdrop-blur-xl border-slate-700/50"
+    >
+      <DropdownMenuItem className="hover:bg-slate-800/50 focus:bg-slate-800/50 text-slate-300 hover:text-white">
+        Light
+      </DropdownMenuItem>
+      <DropdownMenuItem className="hover:bg-slate-800/50 focus:bg-slate-800/50 text-slate-300 hover:text-white">
+        Dark
+      </DropdownMenuItem>
+      <DropdownMenuItem className="hover:bg-slate-800/50 focus:bg-slate-800/50 text-slate-300 hover:text-white">
+        System
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+);
 
-          {/* User card */}
-          <div className="mt-4 flex items-center gap-3 rounded-lg bg-neutral-800/50 p-3">
-            <Avatar className="h-12 w-12 border-2 border-neutral-700">
-              <AvatarImage src={user?.profilePicture} alt={user?.fullname} />
-              <AvatarFallback className="bg-gradient-to-r from-cyan-400 to-fuchsia-500 text-white">
-                {getInitials(user?.fullname)}
-              </AvatarFallback>
-            </Avatar>
+/* ===================== MOBILE NAVBAR ===================== */
+export const MobileNavbar = ({
+  user,
+  loading,
+  handleLogout,
+  getInitials,
+}: any) => (
+  <Sheet>
+    <SheetTrigger asChild>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="relative rounded-full text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 transition-all duration-300"
+      >
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 opacity-0 hover:opacity-10 transition-opacity duration-300"></div>
+        <Menu className="h-5 w-5" />
+      </Button>
+    </SheetTrigger>
+    <SheetContent
+      side="right"
+      className="w-80 bg-slate-950/95 backdrop-blur-xl border-slate-800/50"
+    >
+      <SheetHeader>
+        <div className="flex justify-between items-center">
+          <SheetTitle className="flex items-center gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-cyan-400 to-violet-500 opacity-75 blur-sm"></div>
+              <div className="relative rounded-lg bg-gradient-to-r from-cyan-400 to-violet-500 p-1.5 shadow-lg shadow-cyan-500/25">
+                <Shield className="h-4 w-4 text-white" />
+              </div>
+            </div>
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-500 bg-clip-text text-lg font-bold text-transparent">
+              Super Mall
+            </span>
+          </SheetTitle>
+          <ThemeToggle />
+        </div>
+
+        {/* User Card */}
+        <div className="mt-6 rounded-xl bg-slate-900/50 border border-slate-800/50 p-4 shadow-lg shadow-cyan-500/5">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 opacity-20 blur-sm"></div>
+              <Avatar className="relative h-12 w-12 border-2 border-slate-700">
+                <AvatarImage src={user?.profilePicture} alt={user?.fullname} />
+                <AvatarFallback className="bg-gradient-to-r from-cyan-400 to-violet-500 text-white font-semibold">
+                  {getInitials(user?.fullname)}
+                </AvatarFallback>
+              </Avatar>
+            </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-neutral-200">
+              <p className="truncate font-semibold text-white">
                 {user?.fullname || "User"}
               </p>
-              <p className="truncate text-xs text-neutral-400">{user?.email}</p>
-              <div className="mt-1 flex items-center gap-1">
+              <p className="truncate text-sm text-slate-400">{user?.email}</p>
+              <div className="mt-2 flex gap-1">
                 {user?.admin && (
-                  <Badge variant="secondary" className="text-xs">
-                    <Shield className="mr-1 h-3 w-3" />
-                    Admin
+                  <Badge className="text-xs bg-gradient-to-r from-violet-500 to-purple-600 text-white border-0 shadow-lg shadow-violet-500/25">
+                    <Shield className="mr-1 h-3 w-3" /> Admin
                   </Badge>
                 )}
                 {user?.isVerified ? (
-                  <Badge
-                    variant="default"
-                    className="text-xs bg-emerald-100 text-emerald-800"
-                  >
+                  <Badge className="text-xs bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-0 shadow-lg shadow-emerald-500/25">
                     Verified
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge
+                    variant="outline"
+                    className="text-xs border-slate-600 text-slate-400"
+                  >
                     Unverified
                   </Badge>
                 )}
               </div>
             </div>
           </div>
-        </SheetHeader>
-
-        <Separator className="my-4" />
-
-        {/* Links */}
-        <div className="flex flex-col gap-2">
-          {user?.admin ? (
-            <>
-              <SectionTitle>ADMIN MENU</SectionTitle>
-              <MobileLink to="/" label="Home" icon={Home} />
-              <MobileLink
-                to="/admin/dashboard"
-                label="Dashboard"
-                icon={BarChart3}
-              />
-              <MobileLink to="/admin/data" label="User Data" icon={Database} />
-              <MobileLink to="/admin/logs" label="Query Logs" icon={History} />
-              <MobileLink
-                to="/admin/managepoi"
-                label="Manage POI"
-                icon={MapPin}
-              />
-              <MobileLink
-                to="/admin/upload-data"
-                label="Upload Data"
-                icon={Upload}
-              />
-            </>
-          ) : (
-            <>
-              <SectionTitle>NAVIGATION</SectionTitle>
-              <MobileLink to="/" label="Home" icon={Home} />
-              <MobileLink to="/dashboard" label="Dashboard" icon={BarChart3} />
-              <MobileLink to="/searchpoi" label="Search POI" icon={Search} />
-              <MobileLink to="/decrypt" label="Decrypt Data" icon={Lock} />
-              <MobileLink to="/history" label="Query History" icon={History} />
-            </>
-          )}
-
-          <Separator className="my-4" />
-          <SectionTitle>ACCOUNT</SectionTitle>
-          <MobileLink to="/profile" label="Profile Settings" icon={Settings} />
-          <button
-            onClick={handleLogout}
-            disabled={loading}
-            className="mt-2 flex items-center gap-3 rounded-lg px-3 py-2.5 text-left text-neutral-300 transition hover:bg-red-500/10 hover:text-red-400"
-          >
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <LogOut className="h-4 w-4" />
-            )}
-            <span>{loading ? "Logging out…" : "Log out"}</span>
-          </button>
         </div>
-      </SheetContent>
-    </Sheet>
-  );
-};
+      </SheetHeader>
 
-/* ─────────────────────────────  REUSABLES  ───────────────────────────── */
+      <Separator className="my-6 bg-slate-800/50" />
+
+      <div className="flex flex-col gap-1">
+        {user?.admin ? (
+          <>
+            <SectionTitle>ADMIN MENU</SectionTitle>
+            <MobileLink to="/" label="Home" icon={Home} />
+            <MobileLink
+              to="/admin/create-shop"
+              label="Create Shop"
+              icon={LucidePlusSquare}
+            />
+            <MobileLink
+              to="/admin/manage-shops"
+              label="Manage Shops"
+              icon={LucideStore}
+            />
+            <MobileLink
+              to="/admin/manage-products"
+              label="Manage Products"
+              icon={LucideShoppingBag}
+            />
+            <MobileLink
+              to="/admin/manage-offers"
+              label="Manage Offers"
+              icon={LucideTags}
+            />
+            <MobileLink
+              to="/admin/manage-categories"
+              label="Manage Categories"
+              icon={LucideLayers}
+            />
+            <MobileLink
+              to="/admin/manage-floors"
+              label="Manage Floors"
+              icon={LucideBuilding2}
+            />
+          </>
+        ) : (
+          <>
+            <SectionTitle>NAVIGATION</SectionTitle>
+            <MobileLink to="/" label="Home" icon={Home} />
+            <MobileLink to="/shop-list" label="Shop List" icon={LucideList} />
+            <MobileLink
+              to="/products"
+              label="All Products"
+              icon={LucidePackageSearch}
+            />
+            <MobileLink
+              to="/compare"
+              label="Compare Products"
+              icon={LucideGitCompare}
+            />
+          </>
+        )}
+
+        <Separator className="my-6 bg-slate-800/50" />
+        <SectionTitle>ACCOUNT</SectionTitle>
+        <MobileLink to="/profile" label="Profile Settings" icon={Settings} />
+
+        <button
+          onClick={handleLogout}
+          disabled={loading}
+          className="group mt-3 flex items-center gap-3 rounded-lg px-3 py-3 text-slate-300 hover:bg-red-500/10 hover:text-red-400 transition-all duration-300"
+        >
+          {loading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <LogOut className="h-4 w-4 group-hover:text-red-400 transition-colors" />
+          )}
+          <span className="font-medium">
+            {loading ? "Logging out…" : "Log out"}
+          </span>
+        </button>
+      </div>
+    </SheetContent>
+  </Sheet>
+);
+
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-  <h3 className="mb-2 px-2 text-xs font-semibold tracking-wide text-neutral-500">
+  <h3 className="px-3 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
     {children}
   </h3>
 );
@@ -438,10 +461,10 @@ const MobileLink = ({
   <SheetClose asChild>
     <Link
       to={to}
-      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-neutral-300 transition hover:bg-neutral-800/60 hover:text-cyan-400"
+      className="group flex items-center gap-3 rounded-lg px-3 py-3 text-slate-300 hover:bg-slate-800/50 hover:text-white transition-all duration-300"
     >
-      <Icon className="h-4 w-4" />
-      <span>{label}</span>
+      <Icon className="h-4 w-4 group-hover:text-cyan-400 transition-colors" />
+      <span className="font-medium">{label}</span>
     </Link>
   </SheetClose>
 );

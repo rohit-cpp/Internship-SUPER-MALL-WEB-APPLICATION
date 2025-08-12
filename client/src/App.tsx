@@ -10,7 +10,7 @@ import Signup from "./auth/Signup";
 import ForgotPassword from "./auth/ForgotPassword";
 import ResetPassword from "./auth/ResetPassword";
 import VerifyEmail from "./auth/VerifyEmail";
-import HeroSection from "./components/HeroSection";
+
 import MainLayout from "./Layout/MainLayout";
 import Profile from "./components/Profile";
 
@@ -25,14 +25,22 @@ import ManageOffers from "./admin/ManageOffer";
 import ManageCategories from "./admin/ManageCategories";
 import ManageFloors from "./admin/ManageFloors";
 import AdminLayout from "./admin/AdminLayout";
-import CategoryList from "./user/CategoryList";
+
+import Home from "./components/HeroSection";
+
 import ShopList from "./user/ShopList";
-import ShopDetails from "./user/ShopDetails";
-import FloorWiseShops from "./user/FloorWiseShop";
-import OfferList from "./user/OfferList";
-import FilteredProducts from "./user/FilteredProducts";
+import ShopDetail from "./user/ShopDetail";
+import ManageProducts from "./admin/ManageProducts";
+import AllProducts from "./user/AllProducts";
 import CompareProducts from "./user/CompareProducts";
+
 /* ================================================================================ */
+
+type HeroProps = {
+  crumbs: string[];
+  title: string;
+  showBackButton?: boolean;
+};
 
 const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useUserStore();
@@ -70,46 +78,35 @@ const appRouter = createBrowserRouter([
     element: (
       // <ProtectedRoutes>
       <MainLayout />
-      // {/* </ProtectedRoutes> */}
+      // </ProtectedRoutes>
     ),
     children: [
-      {
-        path: "/",
-        element: <HeroSection />,
-      },
       {
         path: "/profile",
         element: <Profile />,
       },
       //User routes with protected route
       {
-        path: "/category-list",
-        element: <CategoryList />,
+        path: "/",
+        element: <Home />,
       },
       {
-        path: "/categories/:categoryId/shops",
+        path: "/shop-list",
         element: <ShopList />,
       },
       {
-        path: "/shops/:shopId",
-        element: <ShopDetails />,
-      },
-      {
-        path: "/floors/:floorNumber/shops",
-        element: <FloorWiseShops />,
-      },
-      {
-        path: "/offers",
-        element: <OfferList />,
+        path: "/shops/:id",
+        element: <ShopDetail />,
       },
       {
         path: "/products",
-        element: <FilteredProducts />,
+        element: <AllProducts />,
       },
       {
         path: "/compare",
         element: <CompareProducts />,
       },
+
       // Admin routes with AdminLayout
       {
         path: "/admin",
@@ -119,8 +116,9 @@ const appRouter = createBrowserRouter([
           // {/* </AdminRoute> */}
         ),
         children: [
-          // { path: "create-shop", element: <CreateShop /> },
+          { path: "create-shop", element: <ManageShops /> },
           { path: "manage-shops", element: <ManageShops /> },
+          { path: "manage-products", element: <ManageProducts /> },
           { path: "manage-offers", element: <ManageOffers /> },
           { path: "manage-categories", element: <ManageCategories /> },
           { path: "manage-floors", element: <ManageFloors /> },

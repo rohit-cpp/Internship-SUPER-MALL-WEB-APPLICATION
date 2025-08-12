@@ -9,11 +9,13 @@ import {
   Building2,
   Menu as MenuIcon,
   X as CloseIcon,
+  Key,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const menuItems = [
   { name: "Manage Shops", path: "/manage-shops", icon: Home },
+  { name: "Manage Products", path: "/manage-products", icon: Key },
   { name: "Manage Offers", path: "/manage-offers", icon: Tags },
   { name: "Manage Categories", path: "/manage-categories", icon: Layers },
   { name: "Manage Floors", path: "/manage-floors", icon: Building2 },

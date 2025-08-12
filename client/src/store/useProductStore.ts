@@ -29,6 +29,8 @@ type ProductState = {
   deleteProduct: (id: string) => Promise<void>;
   compareProducts: (ids: string[]) => Promise<void>;
   filterProducts: (params: { shop?: string; category?: string }) => Promise<void>;
+  getProductsByShop: (shopId: string) => Promise<void>;
+
 };
 
 export const useProductStore = create<ProductState>()(
@@ -145,8 +147,27 @@ export const useProductStore = create<ProductState>()(
           toast.error(err.response?.data?.message || "Failed to filter products");
           set({ loading: false });
         }
-      }
+      },
+      //get product by shop
+      getProductsByShop: async (shopId: string) => {
+  try {
+    set({ loading: true });
+    const res = await axios.get(`${API_END_POINT}/filter?shop=${shopId}`);
+    if (res.data.success) {
+      set({ products: res.data.products, loading: false });
+    } else {
+      set({ products: [], loading: false });
+    }
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || "Failed to fetch products for shop");
+    set({ loading: false });
+  }
+},
+
     }),
     { name: "product-store", storage: createJSONStorage(() => localStorage) }
   )
+
+  
 );
+

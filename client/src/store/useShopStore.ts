@@ -9,7 +9,7 @@ axios.defaults.withCredentials = true;
 type Shop = {
   _id: string;
   name: string;
-  owner: string; // could be ObjectId or populated User
+  owner: string; 
   category: string;
   floor: string;
   description?: string;

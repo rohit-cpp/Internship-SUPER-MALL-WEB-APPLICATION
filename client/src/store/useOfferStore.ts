@@ -42,16 +42,21 @@ export const useOfferStore = create<OfferState>()(
           set({ loading: false });
         }
       },
-      getOffersByShop: async (shopId) => {
-        try {
-          set({ loading: true });
-          const res = await axios.get(`${API_END_POINT}/shop/${shopId}`);
-          if (res.data.success) set({ shopOffers: res.data.offers, loading: false });
-        } catch (err: any) {
-          toast.error(err.response?.data?.message || "Failed to fetch shop offers");
-          set({ loading: false });
-        }
-      },
+     getOffersByShop: async (shopId: string) => {
+  try {
+    set({ loading: true });
+    const res = await axios.get(`${API_END_POINT}/shop/${shopId}`);
+    if (res.data.success) {
+      set({ shopOffers: res.data.offers, loading: false });
+    } else {
+      set({ shopOffers: [], loading: false });
+    }
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || "Failed to fetch offers for shop");
+    set({ loading: false });
+  }
+},
+
       createOffer: async (data) => {
         try {
           set({ loading: true });

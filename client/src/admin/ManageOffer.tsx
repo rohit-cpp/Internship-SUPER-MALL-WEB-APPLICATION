@@ -27,8 +27,33 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { useOfferStore } from "@/store/useOfferStore";
+import { useShopStore } from "@/store/useShopStore";
+
+// Local types
+interface Offer {
+  _id: string;
+  title: string;
+  description?: string;
+  discountPercentage: number;
+  startDate: string;
+  endDate: string;
+  shop: string | { _id: string; name?: string } | null;
+}
+
+interface Shop {
+  _id: string;
+  name: string;
+}
 
 interface OfferFormData {
   title: string;
@@ -40,15 +65,9 @@ interface OfferFormData {
 }
 
 export default function ManageOffers() {
-  const {
-    offers,
-    getOffers,
-    getOffersByShop,
-    createOffer,
-    updateOffer,
-    deleteOffer,
-    loading,
-  } = useOfferStore();
+  const { offers, getOffers, createOffer, updateOffer, deleteOffer, loading } =
+    useOfferStore();
+  const { shops, getShops } = useShopStore();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -66,9 +85,13 @@ export default function ManageOffers() {
 
   useEffect(() => {
     getOffers();
-  }, [getOffers]);
+    getShops();
+  }, [getOffers, getShops]);
 
-  const resetForm = () =>
+  const safeOffers = Array.isArray(offers) ? offers : [];
+  const safeShops = Array.isArray(shops) ? shops : [];
+
+  const resetForm = () => {
     setForm({
       title: "",
       description: "",
@@ -77,6 +100,8 @@ export default function ManageOffers() {
       endDate: "",
       shop: "",
     });
+    setSelectedOffer(null);
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -88,15 +113,21 @@ export default function ManageOffers() {
     }));
   };
 
-  const openEdit = (offer: any) => {
-    setSelectedOffer(offer);
+  const handleSelectChange = (name: keyof OfferFormData, value: string) => {
+    setForm((f) => ({ ...f, [name]: value }));
+  };
+
+  const openEdit = (offer: Offer) => {
+    const shopId =
+      typeof offer.shop === "string" ? offer.shop : offer.shop?._id || "";
+    setSelectedOffer({ ...offer, _id: offer._id });
     setForm({
       title: offer.title,
       description: offer.description || "",
       discountPercentage: offer.discountPercentage,
       startDate: offer.startDate.slice(0, 10),
       endDate: offer.endDate.slice(0, 10),
-      shop: offer.shop,
+      shop: shopId,
     });
     setIsEditOpen(true);
   };
@@ -112,12 +143,22 @@ export default function ManageOffers() {
       await updateOffer(selectedOffer._id, form);
       setIsEditOpen(false);
       resetForm();
-      setSelectedOffer(null);
     }
   };
 
   const handleDelete = async (id: string) => {
     await deleteOffer(id);
+  };
+
+  const getShopName = (
+    shopRef: string | { _id: string; name?: string } | null | undefined
+  ) => {
+    if (!shopRef) return "No shop";
+    if (typeof shopRef === "string") {
+      const shop = safeShops.find((s) => s._id === shopRef);
+      return shop?.name || "Unknown shop";
+    }
+    return shopRef.name || "Unknown shop";
   };
 
   return (
@@ -128,7 +169,7 @@ export default function ManageOffers() {
           <DialogTrigger asChild>
             <Button>Create Offer</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create Offer</DialogTitle>
             </DialogHeader>
@@ -159,18 +200,29 @@ export default function ManageOffers() {
                     id="discountPercentage"
                     name="discountPercentage"
                     type="number"
+                    min={0}
+                    max={100}
                     value={form.discountPercentage}
                     onChange={handleChange}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="shop">Shop ID</Label>
-                  <Input
-                    id="shop"
-                    name="shop"
+                  <Label htmlFor="shop">Shop</Label>
+                  <Select
                     value={form.shop}
-                    onChange={handleChange}
-                  />
+                    onValueChange={(v) => handleSelectChange("shop", v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select shop" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {safeShops.map((s) => (
+                        <SelectItem key={s._id} value={s._id}>
+                          {s.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -215,64 +267,90 @@ export default function ManageOffers() {
       </div>
 
       {loading ? (
-        <p>Loading...</p>
+        <div className="p-6 text-center">Loading offers...</div>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Discount</TableHead>
-              <TableHead>Duration</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {offers.map((offer) => (
-              <TableRow key={offer._id}>
-                <TableCell>{offer.title}</TableCell>
-                <TableCell>{offer.discountPercentage}%</TableCell>
-                <TableCell>
-                  {offer.startDate.slice(0, 10)} to {offer.endDate.slice(0, 10)}
-                </TableCell>
-                <TableCell className="space-x-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => openEdit(offer)}
-                  >
-                    Edit
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button size="sm" variant="destructive">
-                        Delete
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Delete "{offer.title}"?
-                        </AlertDialogTitle>
-                      </AlertDialogHeader>
-                      <div className="flex justify-end space-x-2 pt-4">
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(offer._id)}
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </div>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </TableCell>
+        <div className="border rounded-md">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Title</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Shop</TableHead>
+                <TableHead>Discount</TableHead>
+                <TableHead>Duration</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {safeOffers.length ? (
+                safeOffers.map((offer) => (
+                  <TableRow key={offer._id}>
+                    <TableCell className="font-medium">{offer.title}</TableCell>
+                    <TableCell className="truncate max-w-xs">
+                      {offer.description || "—"}
+                    </TableCell>
+                    <TableCell>{getShopName(offer.shop)}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {offer.discountPercentage}% off
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div>{offer.startDate.slice(0, 10)}</div>
+                      <div className="text-muted-foreground">
+                        to {offer.endDate.slice(0, 10)}
+                      </div>
+                    </TableCell>
+                    <TableCell className="space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openEdit(offer)}
+                      >
+                        Edit
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" variant="destructive">
+                            Delete
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Delete "{offer.title}"?
+                            </AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <div className="flex justify-end space-x-2 pt-4">
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(offer._id)}
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </div>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    className="text-center py-8 text-muted-foreground"
+                  >
+                    No offers found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       )}
 
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Offer</DialogTitle>
           </DialogHeader>
@@ -303,18 +381,29 @@ export default function ManageOffers() {
                   id="edit-discountPercentage"
                   name="discountPercentage"
                   type="number"
+                  min={0}
+                  max={100}
                   value={form.discountPercentage}
                   onChange={handleChange}
                 />
               </div>
               <div>
-                <Label htmlFor="edit-shop">Shop ID</Label>
-                <Input
-                  id="edit-shop"
-                  name="shop"
+                <Label htmlFor="edit-shop">Shop</Label>
+                <Select
                   value={form.shop}
-                  onChange={handleChange}
-                />
+                  onValueChange={(v) => handleSelectChange("shop", v)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select shop" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {safeShops.map((s) => (
+                      <SelectItem key={s._id} value={s._id}>
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -345,7 +434,6 @@ export default function ManageOffers() {
                 onClick={() => {
                   setIsEditOpen(false);
                   resetForm();
-                  setSelectedOffer(null);
                 }}
               >
                 Cancel

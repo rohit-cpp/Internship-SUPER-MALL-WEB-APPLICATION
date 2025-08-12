@@ -1,159 +1,251 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Shield,
-  MapPin,
-  Search,
-  Lock,
-  Globe,
-  ArrowRight,
-  Star,
-} from "lucide-react";
+// src/pages/Home.js
+import React from "react";
+import { Link } from "react-router-dom";
+import { useUserStore } from "../store/useUserStore";
+import { useShopStore } from "../store/useShopStore";
+import { useProductStore } from "../store/useProductStore";
 
-/* 
-  ⚡ OPTIONAL: Add these utilities to your global CSS (e.g., globals.css) for stronger neon effects
-  .neon-text       { text-shadow: 0 0 8px currentColor, 0 0 16px currentColor; }
-  .neon-border     { box-shadow: 0 0 12px var(--tw-shadow-color); }
-  .neon-gradient   { background: linear-gradient(135deg,#00e6ff 0%,#ff00ff 100%); }
-*/
-
-const HeroSection = () => {
-  const [currentLocation, setCurrentLocation] = useState("Detecting location…");
-  const [isLocationDetected, setIsLocationDetected] = useState(false);
-
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        () => {
-          setCurrentLocation("Location detected");
-          setIsLocationDetected(true);
-        },
-        () => {
-          setCurrentLocation("Location access denied");
-        }
-      );
-    } else {
-      setCurrentLocation("Geolocation not supported");
-    }
-  }, []);
-
-  const features = [
-    { icon: <Shield className="h-5 w-5" />, text: "Privacy-First Encryption" },
-    { icon: <MapPin className="h-5 w-5" />, text: "Precise Spatial Queries" },
-    { icon: <Lock className="h-5 w-5" />, text: "Secure Data Vault" },
-    { icon: <Globe className="h-5 w-5" />, text: "Worldwide Availability" },
-  ];
+export default function Home() {
+  const { allUsers } = useUserStore();
+  const { shops } = useShopStore();
+  const { products } = useProductStore();
 
   return (
-    <section className="relative overflow-hidden isolate">
-      {/* Glow blobs */}
-      <div className="absolute -z-10 inset-0 bg-neutral-900" />
-      <div className="absolute -z-10 blur-3xl">
-        <span className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-fuchsia-600/30 animate-pulse" />
-        <span className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-cyan-500/30 animate-pulse delay-2000" />
-      </div>
-
-      <div className="container mx-auto px-6 py-20 lg:py-28 text-center">
-        {/* Badge */}
-        <Badge
-          variant="outline"
-          className="mx-auto mb-6 flex items-center gap-2 border-fuchsia-500 text-fuchsia-400 neon-border shadow-fuchsia-500/50"
-        >
-          <Star className="h-4 w-4" />
-          Enterprise-Grade Privacy
-        </Badge>
-
-        {/* Headline */}
-        <h1 className="mx-auto max-w-5xl text-4xl md:text-6xl font-extrabold leading-tight tracking-tight text-white">
-          Discover Nearby
-          <span className="block bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-purple-500 bg-clip-text text-transparent neon-text">
-            Points&nbsp;of&nbsp;Interest
-          </span>
-        </h1>
-
-        <p className="mx-auto mt-6 max-w-2xl text-lg md:text-xl text-neutral-300">
-          Lightning-fast location search with zero-knowledge encryption. Your
-          data stays yours—always.
-        </p>
-
-        {/* Location indicator */}
-        <div className="mt-4 flex items-center justify-center gap-2 text-sm text-neutral-400">
-          <MapPin className="h-4 w-4" />
-          <span>{currentLocation}</span>
-          {isLocationDetected && (
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
-          )}
+    <div className="min-h-screen bg-slate-950 text-slate-200">
+      {/* Hero with Illustration */}
+      <header className="relative overflow-hidden border-b border-slate-800/50 bg-slate-950/90 backdrop-blur-xl">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[80%] h-40 bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-500 opacity-20 blur-3xl rounded-full"></div>
         </div>
-
-        {/* CTA buttons */}
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button
-            size="lg"
-            className="relative inline-flex items-center gap-2 px-8 py-3 text-lg font-semibold text-white neon-gradient rounded-lg shadow-cyan-500/40 neon-border hover:shadow-fuchsia-500/60"
-          >
-            <Search className="h-5 w-5" />
-            Start Exploring
-            <ArrowRight className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="border-transparent bg-transparent px-8 py-3 text-lg text-fuchsia-400 hover:border-fuchsia-500 neon-border"
-          >
-            Learn More
-          </Button>
-        </div>
-
-        {/* Feature grid */}
-        <div className="mt-16 grid grid-cols-2 gap-6 sm:grid-cols-4">
-          {features.map(({ icon, text }, i) => (
-            <div
-              key={i}
-              className="flex flex-col items-center gap-3 rounded-lg border border-fuchsia-500/10 bg-neutral-800/60 p-4 transition-all hover:bg-neutral-800 neon-border shadow-fuchsia-500/10"
+        <div className="container mx-auto px-6 py-20 flex flex-col-reverse lg:flex-row items-center gap-12 relative z-10">
+          <div className="flex-1">
+            <h1 className="text-5xl font-extrabold bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-500 bg-clip-text text-transparent drop-shadow">
+              Build & Scale Your Marketplace with Ease
+            </h1>
+            <p className="mt-4 mb-6 text-lg text-slate-400">
+              A fully managed backend & admin suite for users, shops, products,
+              offers, floors, and categories—so you can focus on growth.
+            </p>
+            <Link
+              to="/signup"
+              className="inline-block px-8 py-3 rounded-lg font-semibold text-white shadow-lg shadow-cyan-500/20 bg-gradient-to-r from-cyan-500 to-violet-500 hover:opacity-90 transition"
             >
-              <span className="rounded-full bg-neutral-700 p-3 text-cyan-400 neon-border shadow-cyan-500/30">
-                {icon}
-              </span>
-              <span className="text-sm font-medium text-neutral-200 text-center">
-                {text}
-              </span>
-            </div>
-          ))}
+              Get Started
+            </Link>
+          </div>
+          <div className="flex-1">
+            <img
+              src="/public/photo.jpg"
+              alt="Dashboard Illustration"
+              className="w-full max-w-lg mx-auto drop-shadow-xl rounded-lg"
+            />
+          </div>
         </div>
+      </header>
 
-        {/* Stats */}
-        <div className="mt-16 grid grid-cols-3 gap-10 border-t border-neutral-700 pt-10">
+      {/* Core Modules */}
+      <section className="container mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-center mb-14 bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-500 bg-clip-text text-transparent">
+          Core Modules
+        </h2>
+        <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {[
             {
-              value: "99.99%",
-              label: "Data Confidentiality",
-              color: "text-cyan-400",
+              icon: "👤",
+              title: "User Management",
+              desc: "Signup, login, profile, verification, password flows.",
             },
             {
-              value: "≤1 s",
-              label: "Median Response",
-              color: "text-fuchsia-400",
+              icon: "🏬",
+              title: "Shop Module",
+              desc: "Create, update, delete shops; assign owners & categories.",
             },
             {
-              value: "256-bit",
-              label: "End-to-End AES",
-              color: "text-purple-400",
+              icon: "📦",
+              title: "Product Catalog",
+              desc: "CRUD products, compare, filter by shop & category.",
             },
-          ].map(({ value, label, color }, i) => (
-            <div key={i} className="text-center">
-              <div
-                className={`text-3xl font-extrabold tracking-wide ${color} neon-text`}
-              >
-                {value}
-              </div>
-              <div className="mt-1 text-sm text-neutral-400">{label}</div>
+            {
+              icon: "💸",
+              title: "Offers & Discounts",
+              desc: "Run time-bound promotions with percentage discounts.",
+            },
+            {
+              icon: "🏢",
+              title: "Floor Plans",
+              desc: "Manage floors for multi-level marketplaces.",
+            },
+            {
+              icon: "🗂️",
+              title: "Category Tree",
+              desc: "Organize items into categories and subcategories.",
+            },
+          ].map((f) => (
+            <div
+              key={f.title}
+              className="bg-slate-900/60 border border-slate-800 rounded-xl p-6 shadow-lg hover:shadow-cyan-500/20 transition"
+            >
+              <div className="text-4xl mb-4">{f.icon}</div>
+              <h3 className="text-xl font-semibold mb-2 text-white">
+                {f.title}
+              </h3>
+              <p className="text-slate-400">{f.desc}</p>
             </div>
           ))}
         </div>
-      </div>
-    </section>
-  );
-};
+      </section>
 
-export default HeroSection;
+      {/* Metrics */}
+      <section className="bg-gradient-to-r from-cyan-500 to-violet-500 text-white py-16">
+        <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div>
+            <div className="text-5xl font-extrabold">
+              {allUsers?.length || 0}+
+            </div>
+            <div className="mt-2">Users</div>
+          </div>
+          <div>
+            <div className="text-5xl font-extrabold">{shops?.length || 0}+</div>
+            <div className="mt-2">Shops</div>
+          </div>
+          <div>
+            <div className="text-5xl font-extrabold">
+              {products?.length || 0}+
+            </div>
+            <div className="mt-2">Products</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="container mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-cyan-400 to-violet-500 bg-clip-text text-transparent">
+          What Our Users Say
+        </h2>
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
+          {[
+            {
+              quote: "This platform saved us weeks of development time.",
+              author: "Alice R., CTO at TechFlow",
+            },
+            {
+              quote: "Our product management is seamless and efficient!",
+              author: "Bob M., Founder of ShopEase",
+            },
+            {
+              quote: "Incredible support and privacy-focused design.",
+              author: "Carol L., CEO of PrivyMaps",
+            },
+          ].map((t, i) => (
+            <blockquote
+              key={i}
+              className="relative bg-slate-900 p-6 rounded-xl shadow-lg before:absolute before:top-4 before:left-4 before:text-7xl before:text-slate-700 before:content-['“']"
+            >
+              <p className="relative text-slate-200 mb-4">{t.quote}</p>
+              <footer className="text-right text-sm text-slate-400">
+                — {t.author}
+              </footer>
+            </blockquote>
+          ))}
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="bg-slate-900/60 py-20">
+        <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-cyan-400 to-violet-500 bg-clip-text text-transparent">
+          Pricing Plans
+        </h2>
+        <div className="container mx-auto px-6 grid gap-8 grid-cols-1 md:grid-cols-3">
+          {[
+            {
+              name: "Starter",
+              price: "Free",
+              features: ["1 Shop", "Basic Support"],
+            },
+            {
+              name: "Professional",
+              price: "₹49/mo",
+              features: ["10 Shops", "Email Support", "Analytics"],
+            },
+            {
+              name: "Enterprise",
+              price: "Contact Us",
+              features: [
+                "Unlimited Shops",
+                "Premium Support",
+                "Dedicated Manager",
+              ],
+            },
+          ].map((plan) => (
+            <div
+              key={plan.name}
+              className="bg-slate-950/80 border border-slate-800 rounded-xl p-8 text-center shadow-lg hover:shadow-cyan-500/20 transition"
+            >
+              <h3 className="text-2xl font-semibold mb-4">{plan.name}</h3>
+              <p className="text-4xl font-bold mb-6">{plan.price}</p>
+              <ul className="space-y-2 mb-6 text-slate-400">
+                {plan.features.map((f) => (
+                  <li key={f}>• {f}</li>
+                ))}
+              </ul>
+              <Link
+                to="/signup"
+                className="inline-block px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90 transition"
+              >
+                {plan.price === "Free" ? "Get Started" : "Choose Plan"}
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="container mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-cyan-400 to-violet-500 bg-clip-text text-transparent">
+          Frequently Asked Questions
+        </h2>
+        <div className="space-y-6 max-w-3xl mx-auto text-slate-200">
+          {[
+            {
+              q: "Can I upgrade my plan later?",
+              a: "Yes — you can upgrade or downgrade at any time in your account settings.",
+            },
+            {
+              q: "Is there a free trial?",
+              a: "We offer a 14-day free trial on all paid plans. No credit card required.",
+            },
+            {
+              q: "How secure is my data?",
+              a: "All data is encrypted in transit and at rest. We follow industry best practices.",
+            },
+          ].map((item, i) => (
+            <div key={i}>
+              <h3 className="font-semibold">{item.q}</h3>
+              <p className="mt-1 text-slate-400">{item.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="container mx-auto px-6 py-20 text-center relative">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-[60%] h-40 bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-500 opacity-10 blur-3xl rounded-full"></div>
+        </div>
+        <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-violet-500 bg-clip-text text-transparent">
+          Ready to launch your marketplace?
+        </h2>
+        <p className="mb-8 text-slate-400">
+          Get started today and see how quickly you can onboard your first shop
+          and products.
+        </p>
+        <Link
+          to="/signup"
+          className="px-10 py-4 rounded-lg font-semibold text-white shadow-lg shadow-cyan-500/20 bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90 transition"
+        >
+          Start Free Trial
+        </Link>
+      </section>
+    </div>
+  );
+}
